@@ -1,0 +1,72 @@
+**Importing the libraries**
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import metrics
+from sklearn.metrics import plot_roc_curve,roc_auc_score,confusion_matrix,f1_score
+
+**Importing the dataset**
+
+df = pd.read_csv('/content/Social_Network_Ads.csv')
+df.head()
+
+df.shape
+
+df.drop_duplicates()
+
+df.shape
+
+df.columns
+
+df.drop('User ID',inplace=True,axis = 1)
+
+df.isnull().sum()
+
+df.Gender.unique()
+
+df['Gender'].replace({'Male':1,'Female':0},inplace = True)
+
+df.head()
+
+df['Purchased'].value_counts()
+
+**Splitting the dataset into the Training set and Test set**
+
+df.columns
+
+X = df.loc[:,['Gender', 'Age', 'EstimatedSalary']].values
+Y = df.loc[:,'Purchased']
+X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size=0.2)
+
+**Feature Scaling**
+
+scaler = StandardScaler()
+scaler.fit(X_train)
+X_train_scaled = scaler.transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+**Fitting K-NN to the Training set**
+
+res = []
+for i in range(1,30,2):
+  knn = KNeighborsClassifier(n_neighbors = i)
+  model = knn.fit(X_train_scaled,Y_train)
+  Y_pred = knn.predict(X_test_scaled)
+  print("Test set Accuracy for k = {}: ".format(i), (metrics.accuracy_score(Y_test,Y_pred)*100))
+  res.append((metrics.accuracy_score(Y_test,Y_pred)*100))
+
+**Predicting the Test set results**
+
+res2 = [i for i in range(1,30,2)]
+plt.plot(res2,res)
+
+**Making the Confusion Matrix**
+
+confusion_matrix(Y_test,Y_pred)
+
